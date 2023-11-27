@@ -1,16 +1,41 @@
-import Image from "next/image";
+'use client';
+
+import { getAnimes } from '@/app/action';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+
+let page = 2;
+
+type AnimeCard = JSX.Element;
 
 function LoadMore() {
+  const { ref, inView } = useInView();
+  const [data, setData] = useState<AnimeCard[]>([]);
+
+  useEffect(() => {
+    if (inView) {
+      getAnimes(page).then((res) => {
+        setData((prev) => [...prev, ...res]);
+        page++;
+      });
+    }
+  }, [inView, data]);
+
   return (
     <>
-      <section className="flex justify-center items-center w-full">
-        <div>
+      <section className='grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-10'>
+        {data}
+      </section>
+
+      <section className='flex justify-center items-center w-full'>
+        <div ref={ref}>
           <Image
-            src="./spinner.svg"
-            alt="spinner"
+            src='./spinner.svg'
+            alt='spinner'
             width={56}
             height={56}
-            className="object-contain"
+            className='object-contain'
           />
         </div>
       </section>
